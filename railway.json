@@ -1,0 +1,10 @@
+{
+  "$schema": "https://railway.com/schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "python main.py",
+    "cronSchedule": "0 6 * * 1"
+  }
+}
