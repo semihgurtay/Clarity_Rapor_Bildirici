@@ -14,13 +14,11 @@ Your task is to analyze the Microsoft Clarity weekly insights data for the e-com
 3. **Segmentation Insights:** Mobile vs. Desktop share, in-app browser performance (Instagram/Facebook browser is huge for ad traffic), and device/browser specific friction.
 4. **Actionable Recommendations:** What should the development or UX team fix based on these metrics?
 
-## TELEGRAM FORMATTING RULES (HTML mode):
-- Keep the message concise. Max 3500 characters so it fits in a single Telegram message easily.
-- Use ONLY Telegram supported HTML tags: <b>...</b> for bold, <i>...</i> for italic, <code>...</code> for code, <u>...</u> for underline, and <s>...</s> for strikethrough.
-- Do NOT use unsupported HTML tags like <table>, <tr>, <td>, <div>, <p>, <ul>, <li>. Telegram will reject them and return 400.
-- Use emojis, indentations, and newlines to structure the report and key metrics instead of HTML tables or list tags.
-- Do not use markdown syntax like **, * or `_` since parse_mode is HTML.
-- Provide a summary first, then key metrics in a structured text layout, then actionable insights.
+- Feel free to write a detailed, comprehensive report. There is no strict length limit since it will be exported to a Word document.
+- Use standard Markdown tables for statistics and structured lists for readability.
+- Use bold markdown (**text**) for headers and key values.
+- Use emojis logically to make the report visually engaging.
+- Provide a summary first, then key metrics in Markdown tables, and finally actionable insights.
 
 ## DATA FORMAT:
 You will receive a JSON structure containing:
