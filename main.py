@@ -59,23 +59,43 @@ def main():
         log.info("GPT-4o analiz raporu oluşturuluyor...")
         report_text = generator.generate_report(clarity_data)
         
-        # 4. Çıktıyı Değerlendir
+        # 4. Word (.docx) dosyasını yerel diskte üret
+        from core.docx_generator import parse_markdown_to_docx
+        from datetime import datetime
+        
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        docx_filename = f"Payitaht_Saatcilik_Clarity_Analiz_Raporu_{date_str}.docx"
+        docx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), docx_filename)
+        
+        log.info(f"Word belgesi oluşturuluyor: {docx_path}")
+        parse_markdown_to_docx(report_text, docx_path)
+        
+        # 5. Çıktıyı Değerlendir
         if settings.IS_DRY_RUN:
             log.info("\n=== ÜRETİLEN RAPOR (DRY-RUN) ===")
             print(report_text)
             log.info("================================\n")
+            log.info(f"Word belgesi yerelde bırakıldı: {docx_path}")
             log.info("Dry-run başarıyla tamamlandı.")
             return
 
-        # 5. Telegram Bildirimi Gönder
+        # 6. Telegram üzerinden Word dosyasını gönder
         sender = TelegramSender()
-        success = sender.send_message(report_text)
+        caption = f"📊 <b>payitahtsaatcilik.com - Haftalık Clarity UX ve Performans Raporu</b> ({date_str})"
+        success = sender.send_document(docx_path, caption=caption)
+        
+        # Dosya gönderildikten sonra temizlik yap
+        try:
+            os.remove(docx_path)
+            log.info("Yerel Word belgesi temizlendi.")
+        except Exception as remove_err:
+            log.warning(f"Yerel dosya silinemedi: {remove_err}")
         
         if success:
-            log.info("🎉 Haftalık Clarity raporu başarıyla Telegram üzerinden iletildi!")
+            log.info("🎉 Haftalık Clarity raporu (Word) başarıyla Telegram üzerinden iletildi!")
             sys.exit(0)
         else:
-            log.error("❌ Telegram bildirimi gönderilemedi.")
+            log.error("❌ Telegram'dan dosya gönderilemedi.")
             sys.exit(1)
 
     except Exception as e:
