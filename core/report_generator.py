@@ -5,29 +5,26 @@ from config import settings
 
 log = logging.getLogger("ReportGenerator")
 
-REPORT_SYSTEM_PROMPT = """You are an expert UX and Conversion Rate Optimization (CRO) Analyst.
-Your task is to analyze the Microsoft Clarity weekly insights data for the e-commerce store "payitahtsaatcilik.com" (selling luxury wrist watches) and generate a concise, high-impact Telegram weekly report in Turkish.
+REPORT_SYSTEM_PROMPT = """You are an expert UX, Conversion Rate Optimization (CRO), and SEO Analyst.
+Your task is to analyze BOTH the Microsoft Clarity weekly insights data AND the Perplexity AI SEO visibility analysis for the e-commerce store "payitahtsaatcilik.com", and generate a concise, high-impact Telegram weekly report in Turkish.
 
 ## ANALYTICAL FOCUS:
-1. **Engagement Metrics:** Session duration, scroll depth, active time, click metrics.
-2. **Friction Metrics:** Quickback clicks (high bounce on details), dead clicks, rage clicks.
-3. **Segmentation Insights:** Mobile vs. Desktop share, in-app browser performance (Instagram/Facebook browser is huge for ad traffic), and device/browser specific friction.
-4. **Actionable Recommendations:** What should the development or UX team fix based on these metrics?
+1. **UX & Engagement Metrics:** Session duration, scroll depth, active time, click metrics from Clarity.
+2. **Friction Metrics:** Quickback clicks, dead clicks, rage clicks from Clarity.
+3. **Segmentation Insights:** Mobile vs. Desktop, source, channel, and device specific friction.
+4. **SEO & AIO Visibility:** Summarize and highlight the key findings from the Perplexity SEO data provided.
+5. **Actionable Recommendations:** What should the development, marketing, or UX team fix based on these combined UX and SEO metrics?
 
-- Feel free to write a detailed, comprehensive report. There is no strict length limit since it will be exported to a Word document.
+- Write a detailed, comprehensive report. There is no strict length limit since it will be exported to a Word document.
 - Use standard Markdown tables for statistics and structured lists for readability.
 - Use bold markdown (**text**) for headers and key values.
 - Use emojis logically to make the report visually engaging.
-- Provide a summary first, then key metrics in Markdown tables, and finally actionable insights.
+- Provide a summary first, then key metrics in Markdown tables, then SEO insights, and finally actionable recommendations.
 
 ## DATA FORMAT:
-You will receive a JSON structure containing:
-- overview: general stats
-- devices: stats per device
-- sources: stats per source/medium
-- channels: stats per marketing channel
-- browsers: stats per browser
-- urls: top pages visited
+You will receive:
+1. A JSON structure containing Clarity UX data (overview, devices, sources, channels, browsers, urls).
+2. A text block containing Perplexity AI SEO Analysis data.
 
 Write the report in a highly professional, business-technical tone, keeping it strictly factual and actionable. Avoid generic fluff.
 """
@@ -36,15 +33,23 @@ class ReportGenerator:
     def __init__(self):
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
-    def generate_report(self, clarity_data: dict) -> str:
-        """Clarity verilerini GPT-4o ile analiz ederek Türkçe Telegram raporu üret."""
-        log.info("GPT-4o ile Clarity analiz raporu üretiliyor...")
+    def generate_report(self, clarity_data: dict, seo_data: str) -> str:
+        """Clarity ve SEO verilerini GPT-4o ile analiz ederek Türkçe rapor üret."""
+        log.info("GPT-4o ile Clarity + SEO birleşik analiz raporu üretiliyor...")
         
         user_message = f"""Here is the Microsoft Clarity JSON data for the last 7 days:
 
 {json.dumps(clarity_data, indent=2)}
 
-Please write the weekly performance and UX analysis report in Turkish. Make sure it follows the Telegram HTML format rules. Keep it under 3500 characters."""
+---
+
+Here is the Perplexity AI SEO & Visibility Analysis:
+
+{seo_data}
+
+---
+
+Please write the combined weekly UX and SEO performance analysis report in Turkish. Make sure it is well-structured in Markdown format, as it will be saved as a Word document."""
 
         try:
             response = self.client.chat.completions.create(

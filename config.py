@@ -7,20 +7,25 @@ _ROOT = os.path.dirname(os.path.abspath(__file__))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-# .env dosyasını yükle (Lokal geliştirme için)
-env_path = os.path.join(_ROOT, ".env")
-if os.path.exists(env_path):
-    load_dotenv(env_path, override=True)
+# _knowledge dizinindeki master.env dosyasını bul (3 üst klasör veya Workspace kökü)
+WORKSPACE_ROOT = os.path.dirname(os.path.dirname(_ROOT))
+MASTER_ENV_PATH = os.path.join(WORKSPACE_ROOT, "_knowledge", "credentials", "master.env")
+
+if os.path.exists(MASTER_ENV_PATH):
+    load_dotenv(MASTER_ENV_PATH, override=True)
+else:
+    print(f"Uyarı: master.env bulunamadı! Aranan yol: {MASTER_ENV_PATH}")
 
 class Settings:
     ENV: str = os.getenv("ENV", "production")
     IS_DRY_RUN: bool = os.getenv("DRY_RUN", "false").lower() in ("true", "1", "yes")
 
-    # API Anahtarları
+    # API Anahtarları (master.env'den)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
     ADMIN_CHAT_ID: str = os.getenv("ADMIN_CHAT_ID", "")
     CLARITY_API_TOKEN: str = os.getenv("CLARITY_API_TOKEN", "")
+    PERPLEXITY_API_KEY: str = os.getenv("PERPLEXITY_API_KEY", "")
 
     def validate(self):
         """Kritik ayarların varlığını kontrol et (Fail-Fast)."""
@@ -44,6 +49,8 @@ class Settings:
             missing.append("ADMIN_CHAT_ID")
         if not self.CLARITY_API_TOKEN:
             missing.append("CLARITY_API_TOKEN")
+        if not self.PERPLEXITY_API_KEY:
+            missing.append("PERPLEXITY_API_KEY")
 
         if missing:
             raise ValueError(f"Kritik ortam değişkenleri eksik: {', '.join(missing)}")

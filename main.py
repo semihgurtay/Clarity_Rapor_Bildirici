@@ -24,6 +24,7 @@ if _ROOT not in sys.path:
 from config import settings
 from core.clarity_client import ClarityClient
 from core.report_generator import ReportGenerator
+from core.seo_analyzer import SEOAnalyzer
 from infrastructure.telegram_sender import TelegramSender
 
 # Logging Kurulumu
@@ -37,7 +38,7 @@ logging.basicConfig(
 log = logging.getLogger("ClarityNotifier")
 
 def main():
-    parser = argparse.ArgumentParser(description="Haftalık Microsoft Clarity Telegram Raporlayıcı")
+    parser = argparse.ArgumentParser(description="Haftalık Microsoft Clarity ve SEO Telegram Raporlayıcı")
     parser.add_argument("--dry-run", action="store_true", help="Mesajı Telegram'a göndermeden sadece ekrana yazar")
     args = parser.parse_args()
 
@@ -54,12 +55,16 @@ def main():
         log.info("Clarity verileri çekiliyor...")
         clarity_data = client.get_weekly_insights()
         
-        # 3. GPT-4o ile Analiz Yap
+        # 3. SEO ve AIO Analizini Yap
+        seo_client = SEOAnalyzer()
+        seo_data = seo_client.fetch_seo_insights("payitahtsaatcilik.com")
+        
+        # 4. GPT-4o ile Birleşik Analiz Yap
         generator = ReportGenerator()
         log.info("GPT-4o analiz raporu oluşturuluyor...")
-        report_text = generator.generate_report(clarity_data)
+        report_text = generator.generate_report(clarity_data, seo_data)
         
-        # 4. Word (.docx) dosyasını yerel diskte üret
+        # 5. Word (.docx) dosyasını yerel diskte üret
         from core.docx_generator import parse_markdown_to_docx
         from datetime import datetime
         
