@@ -53,13 +53,13 @@ Please write the combined weekly UX and SEO performance analysis report in Turki
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": REPORT_SYSTEM_PROMPT},
                     {"role": "user", "content": user_message}
                 ],
                 temperature=0.7,
-                max_tokens=1500
+                max_tokens=3000
             )
             report = response.choices[0].message.content
             log.info("Analiz raporu başarıyla üretildi.")
